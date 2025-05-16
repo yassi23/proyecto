@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <title>Dashboard Admin - Gestión de Tareas</title>
+    <style>
+        /* ... mantiene todo tu CSS tal cual ... */
+    </style>
+</head>
+<body>
+    <!-- BARRA LATERAL -->
+    <div class="sidebar">
+        <h2>Admin {{ nombre }}</h2>
+        <button onclick="showSection('formTarea')">➕ Agregar Tarea</button>
+        <button onclick="showSection('usuariosSection')">👥 Ver Usuarios</button>
+        <button onclick="showSection('tareasSection')">📋 Ver Tareas</button>
+        <a class="logout-link" href="{{ url_for('logout') }}">Cerrar sesión</a>
+    </div>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <div class="main-content">
+        <h1>Panel de Administración</h1>
+
+        <!-- FORM NUEVA TAREA -->
+        <section id="formTarea" class="active">
+            <h2>Agregar nueva tarea a un usuario</h2>
+            <form method="POST" action="{{ url_for('admin_nueva_tarea') }}">
+                <label for="usuario_id">Selecciona usuario:</label>
+                <select name="usuario_id" id="usuario_id" required>
+                    {% for usuario in usuarios %}
+                        <option value="{{ usuario[0] }}">{{ usuario[1] }}</option>
+                    {% endfor %}
+                </select>
+
+                <label for="titulo">Título:</label>
+                <input type="text" id="titulo" name="titulo" required>
+
+                <label for="descripcion">Descripción:</label>
+                <textarea id="descripcion" name="descripcion" rows="4"></textarea>
+
+                <label for="fecha_inicio">Fecha de Inicio:</label>
+                <input type="date" id="fecha_inicio" name="fecha_inicio" required>
+
+                <label for="fecha_fin">Fecha de Fin:</label>
+                <input type="date" id="fecha_fin" name="fecha_fin" required>
+
+                <button type="submit">Agregar tarea</button>
+            </form>
+        </section>
+
+        <!-- TABLA USUARIOS -->
+        <section id="usuariosSection">
+            <h2>Usuarios Registrados</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Correo</th> <!-- Agregado correo aquí -->
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for usuario in usuarios %}
+                    <tr>
+                        <td>{{ usuario[0] }}</td>
+                        <td>{{ usuario[1] }}</td>
+                        <td>{{ usuario[2] }}</td> <!-- Asumiendo que en usuarios tienes (id, nombre, correo) -->
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="3">No hay usuarios registrados.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+
+        <!-- TABLA TAREAS -->
+        <section id="tareasSection">
+            <h2>Tareas Actuales</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID Tarea</th>
+                        <th>Usuario</th>
+                        <th>Título</th>
+                        <th>Estado</th>
+                        <th>Eliminar</th>
+                        <th>Reasignar</th> <!-- Nueva columna para reasignar -->
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for tarea in tareas %}
+                    <tr>
+                        <td>{{ tarea[0] }}</td>
+                        <td>{{ tarea[1] }}</td>
+                        <td>{{ tarea[2] }}</td>
+                        <td>{{ tarea[3] }}</td>
+                        <td>
+                            <form method="POST" action="{{ url_for('admin_eliminar_tarea', tarea_id=tarea[0]) }}" style="margin:0;">
+                                <button type="submit" onclick="return confirm('¿Estás seguro de eliminar esta tarea?')">Eliminar</button>
+                            </form>
+                        </td>
+                        <td>
+                            <!-- Formulario para reasignar la tarea -->
+                            <form method="POST" action="{{ url_for('admin_reasignar_tarea') }}">
+                                <input type="hidden" name="tarea_id" value="{{ tarea[0] }}">
+                                <select name="nuevo_usuario_id" required>
+                                    <option value="" disabled selected>Selecciona usuario</option>
+                                    {% for usuario in usuarios %}
+                                        <option value="{{ usuario[0] }}">{{ usuario[1] }}</option>
+                                    {% endfor %}
+                                </select>
+                                <button type="submit" style="margin-top:5px;">Reasignar</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6">No hay tareas registradas.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+    </div>
+
+    <script>
+        function showSection(id) {
+            document.querySelectorAll('.main-content section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(id).classList.add('active');
+        }
+    </script>
+</body>
+</html>
