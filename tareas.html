@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <title>Mis Tareas - Gestión</title>
+    <style>
+        /* Reset y fuentes */
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f4f8;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Barra lateral */
+        nav.sidebar {
+            width: 220px;
+            background-color: #2980b9;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            padding: 30px 20px;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+        }
+        nav.sidebar h2 {
+            margin-bottom: 40px;
+            font-weight: 700;
+            font-size: 1.6rem;
+            text-align: center;
+            letter-spacing: 1.5px;
+        }
+        nav.sidebar button {
+            background-color: transparent;
+            border: none;
+            color: white;
+            font-size: 1.1rem;
+            padding: 12px 15px;
+            margin-bottom: 20px;
+            cursor: pointer;
+            border-radius: 6px;
+            text-align: left;
+            transition: background-color 0.3s ease;
+        }
+        nav.sidebar button:hover {
+            background-color: #1b6391;
+        }
+
+        /* Contenido principal */
+        main.content {
+            margin-left: 220px;
+            padding: 30px 40px;
+            flex-grow: 1;
+            background-color: #fff;
+            min-height: 100vh;
+        }
+
+        main.content h2 {
+            color: #2c3e50;
+            margin-bottom: 25px;
+            font-weight: 700;
+            font-size: 2rem;
+        }
+
+        /* Bienvenida y mensaje motivacional */
+        .bienvenida {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            color: #2980b9;
+            font-weight: 700;
+            text-align: center;
+            margin-top: 100px;
+        }
+        .mensaje-motivacional {
+            font-size: 1.2rem;
+            margin-bottom: 40px;
+            color: #555;
+            font-style: italic;
+            text-align: center;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.5;
+        }
+
+        /* Tarea */
+        .tarea {
+            background: #ecf0f1;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: box-shadow 0.3s ease;
+        }
+        .tarea:hover {
+            box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+        }
+        .tarea h3 {
+            margin-top: 0;
+            color: #34495e;
+        }
+        .descripcion {
+            margin: 10px 0 15px;
+            color: #555;
+            font-size: 1rem;
+            line-height: 1.4;
+        }
+        .fechas {
+            font-size: 0.9rem;
+            color: #777;
+            margin-bottom: 10px;
+        }
+        .estado {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #34495e;
+        }
+
+        /* Barra de progreso */
+        .progress-bar {
+            background-color: #d1d5db;
+            border-radius: 12px;
+            height: 14px;
+            width: 100%;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+        .progress-fill {
+            height: 100%;
+            border-radius: 12px;
+            transition: width 0.4s ease;
+        }
+        .estado-pendiente {
+            background-color: #e67e22; /* naranja */
+            width: 33%;
+        }
+        .estado-proceso {
+            background-color: #2980b9; /* azul */
+            width: 66%;
+        }
+        .estado-terminado {
+            background-color: #27ae60; /* verde */
+            width: 100%;
+        }
+
+        /* Formulario actualizar estado */
+        #form-actualizar-estado,
+        /* NUEVO formulario reasignar tarea */
+        #form-reasignar-tarea {
+            display: none;
+            background: #ecf0f1;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 400px;
+        }
+        #form-actualizar-estado label,
+        #form-reasignar-tarea label {
+            font-weight: 600;
+            margin-bottom: 6px;
+            display: block;
+            color: #2c3e50;
+        }
+        #form-actualizar-estado select,
+        #form-reasignar-tarea select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 6px;
+            border: 1.5px solid #bdc3c7;
+            font-size: 1rem;
+        }
+        #form-actualizar-estado button,
+        #form-reasignar-tarea button {
+            background-color: #2980b9;
+            color: white;
+            padding: 12px 28px;
+            font-weight: 600;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.25s ease;
+        }
+        #form-actualizar-estado button:hover,
+        #form-reasignar-tarea button:hover {
+            background-color: #1b6391;
+        }
+
+        /* Logout en la parte inferior de sidebar */
+        .logout-link {
+            margin-top: auto;
+            color: #c0392b;
+            font-weight: 600;
+            text-decoration: none;
+            padding: 10px 15px;
+            border-radius: 6px;
+            transition: background-color 0.3s ease;
+        }
+        .logout-link:hover {
+            background-color: #a93226;
+            color: white;
+        }
+
+        /* Contenedor tareas y formularios ocultos inicialmente */
+        #contenedor-tareas,
+        #form-actualizar-estado,
+        #form-reasignar-tarea {
+            display: none;
+        }
+
+        /* Responsive */
+        @media(max-width: 700px) {
+            body {
+                flex-direction: column;
+            }
+            nav.sidebar {
+                width: 100%;
+                flex-direction: row;
+                padding: 15px;
+                justify-content: space-around;
+                position: relative;
+                height: auto;
+            }
+            nav.sidebar h2 {
+                display: none;
+            }
+            main.content {
+                margin-left: 0;
+                padding: 20px;
+            }
+            #form-actualizar-estado,
+            #form-reasignar-tarea {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="sidebar">
+        <h2>Gestión Tareas</h2>
+        <button id="btn-ver-tareas">Ver Tareas</button>
+        <button id="btn-actualizar-estado">Actualizar Estado</button>
+        <!-- NUEVO botón para reasignar tarea -->
+        <button id="btn-reasignar-tarea">Reasignar Tarea</button>
+
+        <a href="{{ url_for('logout') }}" class="logout-link">Cerrar sesión</a>
+    </nav>
+
+    <main class="content">
+        <!-- Portada de bienvenida inicial con mensaje motivacional -->
+        <div id="portada-bienvenida" class="bienvenida">
+            ¡Bienvenido, {{ nombre_usuario }}!
+            <div class="mensaje-motivacional">
+                “El éxito no es la clave de la felicidad. La felicidad es la clave del éxito. 
+                Si amas lo que haces, tendrás éxito.” – Albert Schweitzer
+            </div>
+        </div>
+
+        <!-- Contenedor tareas -->
+        <div id="contenedor-tareas">
+            {% if tareas %}
+                {% for tarea in tareas %}
+                    <div class="tarea">
+                        <h3>{{ tarea[1] }}</h3>
+                        <p class="descripcion">{{ tarea[2] }}</p>
+                        <div class="estado">Estado: {{ tarea[3] }}</div>
+
+                        <div class="progress-bar">
+                            <div class="progress-fill 
+                                {% if tarea[3].lower() == 'pendiente' %}estado-pendiente{% elif tarea[3].lower() == 'proceso' %}estado-proceso{% elif tarea[3].lower() == 'terminado' %}estado-terminado{% endif %}">
+                            </div>
+                        </div>
+
+                        <div class="fechas">
+                            Fecha inicio: {{ tarea[4] }}<br>
+                            Fecha fin: {{ tarea[5] }}
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>No tienes tareas registradas.</p>
+            {% endif %}
+        </div>
+
+        <!-- Formulario actualizar estado -->
+        <div id="form-actualizar-estado">
+            <h2>Actualizar Estado de una Tarea</h2>
+            <form id="form-estado" method="POST" action="">
+                <label for="tarea_id">Selecciona tarea:</label>
+                <select name="tarea_id" id="tarea_id" required>
+                    <option value="" disabled selected>Selecciona una tarea</option>
+                    {% for tarea in tareas %}
+                    <option value="{{ tarea[0] }}">{{ tarea[1] }}</option>
+                    {% endfor %}
+                </select>
+
+                <label for="estado">Nuevo estado:</label>
+                <select name="estado" id="estado" required>
+                    <option value="" disabled selected>Selecciona un estado</option>
+                    <option value="Pendiente">Pendiente</option>
+                    <option value="Proceso">Proceso</option>
+                    <option value="Terminado">Terminado</option>
+                </select>
+
+                <button type="submit">Actualizar</button>
+            </form>
+        </div>
+
+        <!-- NUEVO formulario reasignar tarea -->
+        <div id="form-reasignar-tarea">
+            <h2>Reasignar una tarea a otro usuario</h2>
+            <form id="form-reasignar" method="POST" action="/tareas/reasignar">
+                <label for="tarea_reasignar">Selecciona la tarea a reasignar:</label>
+                <select name="tarea_id" id="tarea_reasignar" required>
+                    <option value="" disabled selected>Selecciona una tarea</option>
+                    {% for tarea in tareas %}
+                    <option value="{{ tarea[0] }}">{{ tarea[1] }}</option>
+                    {% endfor %}
+                </select>
+
+                <label for="nuevo_usuario">Selecciona nuevo usuario:</label>
+                <select name="nuevo_usuario" id="nuevo_usuario" required>
+                    <option value="" disabled selected>Selecciona un usuario</option>
+                    {% for usuario in usuarios %}
+                    <option value="{{ usuario[0] }}">{{ usuario[1] }}</option>
+                    {% endfor %}
+                </select>
+
+                <button type="submit">Reasignar</button>
+            </form>
+        </div>
+    </main>
+
+    <script>
+        // Referencias a botones
+        const btnVerTareas = document.getElementById('btn-ver-tareas');
+        const btnActualizarEstado = document.getElementById('btn-actualizar-estado');
+        const btnReasignarTarea = document.getElementById('btn-reasignar-tarea');
+
+        // Referencias a secciones
+        const contenedorTareas = document.getElementById('contenedor-tareas');
+        const formActualizarEstado = document.getElementById('form-actualizar-estado');
+        const formReasignarTarea = document.getElementById('form-reasignar-tarea');
+        const portadaBienvenida = document.getElementById('portada-bienvenida');
+
+        // Función para ocultar todos los contenedores de contenido y mostrar solo el seleccionado
+        function mostrarSeccion(seccion) {
+            // Ocultar todo primero
+            contenedorTareas.style.display = 'none';
+            formActualizarEstado.style.display = 'none';
+            formReasignarTarea.style.display = 'none';
+            portadaBienvenida.style.display = 'none';
+
+            // Mostrar la sección que corresponde
+            seccion.style.display = 'block';
+        }
+
+        // Mostrar bienvenida al cargar página
+        mostrarSeccion(portadaBienvenida);
+
+        btnVerTareas.addEventListener('click', () => {
+            mostrarSeccion(contenedorTareas);
+        });
+
+        btnActualizarEstado.addEventListener('click', () => {
+            mostrarSeccion(formActualizarEstado);
+        });
+
+        btnReasignarTarea.addEventListener('click', () => {
+            mostrarSeccion(formReasignarTarea);
+        });
+    </script>
+</body>
+</html>
