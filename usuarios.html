@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <title>Lista de Usuarios</title>
+    <style>
+        body {
+            background-color: #f4f7f8;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 40px 20px;
+            margin: 0;
+            color: #2c3e50;
+        }
+        .header {
+            max-width: 700px;
+            margin: 0 auto 30px auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        h2 {
+            margin: 0;
+        }
+        a.logout {
+            background-color: #e74c3c;
+            color: white;
+            text-decoration: none;
+            padding: 8px 14px;
+            border-radius: 4px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+        a.logout:hover {
+            background-color: #c0392b;
+        }
+        table {
+            border-collapse: collapse;
+            width: 700px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        th, td {
+            text-align: left;
+            padding: 12px 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #2980b9;
+            color: white;
+            font-weight: 600;
+        }
+        tr:hover {
+            background-color: #f1f7fc;
+        }
+        .welcome {
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h2>Usuarios Registrados</h2>
+        <a href="{{ url_for('logout') }}" class="logout">Cerrar sesión</a>
+    </div>
+
+    <div class="welcome">Bienvenido, {{ nombre_usuario }}!</div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Correo</th>
+                <th>Rol</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for usuario in usuarios %}
+            <tr>
+                <td>{{ usuario[0] }}</td>
+                <td>{{ usuario[1] }}</td>
+                <td>{{ usuario[2] }}</td>
+                <td>{{ usuario[3] }}</td> <!-- Aquí mostramos el rol -->
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
